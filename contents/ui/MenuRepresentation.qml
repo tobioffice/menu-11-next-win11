@@ -167,9 +167,8 @@ PlasmaCore.Dialog {
 
         if (Plasmoid.configuration.displayPosition === 1) {
             horizMidPoint = screen.x + (screen.width / 2);
-            vertMidPoint = screen.y + (screen.height / 2);
             x = horizMidPoint - width / 2;
-            y = vertMidPoint - height / 2;
+            y = screen.y + screen.height - height - offset - panelSvg.margins.top;
         } else if (Plasmoid.configuration.displayPosition === 2) {
             horizMidPoint = screen.x + (screen.width / 2);
             vertMidPoint = screen.y + (screen.height / 2);

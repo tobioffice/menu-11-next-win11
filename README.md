@@ -1,3 +1,59 @@
+# Menu 11 Next — Win11 fork (rounded floating menu)
+
+Fork of [Eisteed/menu-11-next](https://github.com/Eisteed/menu-11-next) v1.3
+(lineage: [adhec/OnzeMenuKDE](https://github.com/adhec/OnzeMenuKDE) → Eisteed → this fork),
+kept under the same plugin Id `menu.11.next` so installing/upgrading your version
+replaces the stock install **without re-adding or re-configuring the widget**.
+
+## Why this fork exists
+
+When the start menu docks flush against the panel, Plasma disables the frame
+border on the attached edge, so the popup gets sharp square bottom corners —
+regardless of theme. This fork fixes the widget's **"Center" menu position** so
+it opens **floating just above the taskbar, horizontally centered**. A floating
+dialog keeps all four frame borders enabled, so with a rounded Plasma style
+(e.g. [Win11OS-kde](https://github.com/yeyushengfan258/Win11OS-kde)) all four
+corners render rounded — the proper Windows 11 start menu look.
+
+Changes vs upstream v1.3:
+
+- `contents/ui/MenuRepresentation.qml` — `popupPosition()` "Center" option now
+  anchors above the taskbar instead of floating mid-screen.
+- `install.sh` — install/upgrade straight from the source dir, no build step.
+- Everything else is identical to upstream v1.3.
+
+## Recommended setup for the Win11 look
+
+1. `./install.sh`
+2. Apply a rounded Plasma style (e.g. `plasma-apply-desktoptheme Win11OS-dark`)
+3. Right-click the start button → *Configure Menu 11 Next…* → **Menu position: Center**
+4. Optional: set the launcher icon to the Windows logo (ship
+   `plasma/desktoptheme/<variant>/icons/start.svg` from Win11OS-kde as an icon
+   named `win11os-start` and pick it in the widget's icon chooser).
+
+## Roadmap ideas
+
+- Open/close animations (slide-up + spring scale)
+- Soft-translucent "acrylic" polish
+- Configurable popup corner radius & shadow
+
+## Install (no build required)
+
+```bash
+./install.sh
+systemctl --user restart plasma-plasmashell   # if a widget instance is already on a panel
+```
+
+Uninstall:
+
+```bash
+kpackagetool6 --type Plasma/Applet --remove menu.11.next
+```
+
+License: GPL-2.0+ (inherited from upstream). Original upstream docs follow.
+
+---
+
 # Menu 11 Next
 
 ## Windows 11 menu launcher for KDE Plasma 6.5
