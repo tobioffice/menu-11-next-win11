@@ -47,7 +47,64 @@ PlasmaCore.Dialog {
         else
             return Plasmoid.location;
     }
-    hideOnWindowDeactivate: true
+    // Plasma's instant hide-on-deactivate would bypass our closing animation,
+    // so we disable it and close via the Window.active watcher below.
+    hideOnWindowDeactivate: false
+
+    // ---- open/close animation state machine ----
+    readonly property bool animationsEnabled: Plasmoid.configuration.enableAnimations
+    property int animDuration: Math.min(Math.max(80, Plasmoid.configuration.animationDuration), 500)
+
+    property bool menuShown: false      // semantic state: user wants the menu open
+    property bool closingAnim: false    // close animation in flight
+    property bool everActivated: false  // window was activated once (avoids close races while opening)
+
+    onActiveChanged: {
+        if (active) {
+            everActivated = true;
+        } else if (menuShown && everActivated) {
+            closeMenu();
+        }
+    }
+
+    function toggle() {
+        if (closingAnim) {
+            // A close animation is already in flight (e.g. focus lost a moment ago).
+            // Do not re-open — this is how "click start again = close" avoids double toggles.
+            return;
+        }
+        if (menuShown) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
+    }
+
+    function openMenu() {
+        menuShown = true;
+        closeAnim.stop();
+        if (animationsEnabled) {
+            // Prepare before showing so the very first frame is already invisible.
+            rootItem.opacity = 0;
+            rootItem.scale = 0.98;
+        }
+        if (!visible) {
+            visible = true;
+        }
+    }
+
+    function closeMenu() {
+        if (!visible || closingAnim) {
+            return;
+        }
+        if (!animationsEnabled) {
+            root.visible = false; // onVisibleChanged resets the state machine
+            return;
+        }
+        openAnim.stop();
+        closingAnim = true;
+        closeAnim.start();
+    }
 
     // Ensure minimum dimensions to prevent empty dialog error
     width: Math.max(rootItem.width, 300)
@@ -108,8 +165,17 @@ PlasmaCore.Dialog {
             if (Plasmoid.configuration.allAppsViewMode === 2) {
                 ensureCategoryModel();
             }
+            if (animationsEnabled) {
+                openAnim.start();
+            } else {
+                rootItem.opacity = 1;
+                rootItem.scale = 1;
+            }
         } else {
             view.currentIndex = 0;
+            menuShown = false;
+            closingAnim = false;
+            everActivated = false;
         }
     }
 
@@ -127,10 +193,6 @@ PlasmaCore.Dialog {
             x = pos.x;
             y = pos.y;
         }
-    }
-
-    function toggle() {
-        root.visible = !root.visible;
     }
 
     function reset() {
@@ -205,6 +267,26 @@ PlasmaCore.Dialog {
     mainItem: FocusScope {
         id: rootItem
 
+        // Menu content is scaled from its bottom edge, so it appears to rise
+        // from the taskbar and sink back into it on close (Win11-style).
+        transformOrigin: Item.Bottom
+
+        Keys.onEscapePressed: root.closeMenu()
+
+        ParallelAnimation {
+            id: openAnim
+            NumberAnimation { target: rootItem; property: "opacity"; from: 0; to: 1; duration: root.animDuration; easing.type: Easing.OutCubic }
+            NumberAnimation { target: rootItem; property: "scale"; from: 0.98; to: 1; duration: root.animDuration; easing.type: Easing.OutCubic }
+        }
+
+        SequentialAnimation {
+            id: closeAnim
+            ParallelAnimation {
+                NumberAnimation { target: rootItem; property: "opacity"; from: 1; to: 0; duration: Math.max(80, Math.round(root.animDuration * 0.65)); easing.type: Easing.InQuad }
+                NumberAnimation { target: rootItem; property: "scale"; from: 1; to: 0.985; duration: Math.max(80, Math.round(root.animDuration * 0.65)); easing.type: Easing.InQuad }
+            }
+            ScriptAction { script: root.visible = false }
+        }
 
         property int widthComputed: root.cellSizeWidth * Plasmoid.configuration.numberColumns + Kirigami.Units.gridUnit * 2
 

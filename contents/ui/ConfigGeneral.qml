@@ -48,6 +48,8 @@ KCM.SimpleKCM {
     property string cfg_icon: plasmoid.configuration.icon
     property bool cfg_useCustomButtonImage: plasmoid.configuration.useCustomButtonImage
     property string cfg_customButtonImage: plasmoid.configuration.customButtonImage
+    property bool cfg_enableAnimations: plasmoid.configuration.enableAnimations
+    property alias cfg_animationDuration: animationDuration.value
     property alias cfg_numberColumns: numberColumns.value
     property alias cfg_numberRows: numberRows.value
 
@@ -204,6 +206,24 @@ KCM.SimpleKCM {
             id: labels2lines
             text: i18n("Show labels in two lines")
             visible: true
+        }
+
+        CheckBox {
+            id: enableAnimationsCb
+            text: i18n("Animate opening and closing")
+            checked: cfg_enableAnimations
+            onToggled: cfg_enableAnimations = checked
+        }
+
+        RowLayout {
+            visible: cfg_enableAnimations
+            Kirigami.FormData.label: i18n("Animation duration")
+            SpinBox {
+                id: animationDuration
+                from: 80
+                to: 500
+                stepSize: 10
+            }
         }
 
         SpinBox{

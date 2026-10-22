@@ -20,6 +20,15 @@
       <default>2</default>
     </entry>
 
+    <entry name="enableAnimations" type="Bool">
+      <label>Whether the menu animates opening and closing.</label>
+      <default>true</default>
+    </entry>
+    <entry name="animationDuration" type="Int">
+      <label>Menu open/close animation duration in milliseconds.</label>
+      <default>220</default>
+    </entry>
+
     <entry name="icon" type="String">
       <default>start-here-kde</default>
     </entry>

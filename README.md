@@ -33,9 +33,10 @@ Changes vs upstream v1.3:
 
 ## Roadmap ideas
 
-- Open/close animations (slide-up + spring scale)
+- ✅ Open/close animations (fade + scale-in from the taskbar, configurable duration) — done
 - Soft-translucent "acrylic" polish
 - Configurable popup corner radius & shadow
+- Spring/slide open variants
 
 ## Install (no build required)
 
