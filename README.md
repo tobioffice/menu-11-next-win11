@@ -33,7 +33,8 @@ Changes vs upstream v1.3:
 
 ## Roadmap ideas
 
-- ✅ Open/close animations (fade + scale-in from the taskbar, configurable duration) — done
+- Open/close animations (fade + scale) — implemented, but **off by default**; enable
+  via *Configure Menu 11 Next… → Animate opening and closing*
 - Soft-translucent "acrylic" polish
 - Configurable popup corner radius & shadow
 - Spring/slide open variants
